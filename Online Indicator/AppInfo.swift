@@ -3,7 +3,7 @@ import Foundation
 struct AppInfo {
 
     static var marketingVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
     }
 
     static var buildVersion: String {
@@ -15,6 +15,6 @@ struct AppInfo {
     }
 
     static var appName: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "Online Indicator"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "Online Indicator X"
     }
 }

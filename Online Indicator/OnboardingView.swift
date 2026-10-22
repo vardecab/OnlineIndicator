@@ -25,7 +25,7 @@ struct OnboardingView: View {
                     .animation(.spring(response: 0.5, dampingFraction: 0.65).delay(0.05), value: appeared)
 
                 VStack(spacing: 6) {
-                    Text("Online Indicator")
+                    Text("Online Indicator X")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
 
                     Text("Monitors your connection and displays real time status\nin the menu bar so it is always visible.")

@@ -36,7 +36,7 @@ private struct SemanticVersion: Comparable, Equatable {
 
 class UpdateChecker {
 
-    static let repoOwner = "bornexplorer"
+    static let repoOwner = "vardecab"
     static let repoName  = "OnlineIndicator"
 
     private static var apiURL: URL? {

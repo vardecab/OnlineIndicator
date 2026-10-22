@@ -8,7 +8,7 @@
 
 /* Begin PBXFileReference section */
 		662BD7942F4C5FF70044FC6E /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = .gitignore; sourceTree = "<group>"; };
-		6677091A2F48D39F00A97525 /* Online Indicator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Online Indicator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6677091A2F48D39F00A97525 /* Online Indicator X.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Online Indicator X.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -42,7 +42,7 @@
 		6677091B2F48D39F00A97525 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6677091A2F48D39F00A97525 /* Online Indicator.app */,
+				6677091A2F48D39F00A97525 /* Online Indicator X.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -57,7 +57,6 @@
 				667709162F48D39F00A97525 /* Sources */,
 				667709172F48D39F00A97525 /* Frameworks */,
 				667709182F48D39F00A97525 /* Resources */,
-				662324492F48D4A60075F9BE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -70,7 +69,7 @@
 			packageProductDependencies = (
 			);
 			productName = "Online Indicator";
-			productReference = 6677091A2F48D39F00A97525 /* Online Indicator.app */;
+			productReference = 6677091A2F48D39F00A97525 /* Online Indicator X.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -117,26 +116,7 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		662324492F48D4A60075F9BE /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "#!/bin/bash\nset -e\n\necho \"========== VERSION SCRIPT START ==========\"\n\nif [ -d \"$SRCROOT/.git\" ]; then\n\n    gitHash=$(git rev-parse --short HEAD)\n    echo \"Git hash: $gitHash\"\n\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $gitHash\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\" 2>/dev/null \\\n    || /usr/libexec/PlistBuddy -c \"Add :CFBundleVersion string $gitHash\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n\n    echo \"Updated CFBundleVersion:\"\n    /usr/libexec/PlistBuddy -c \"Print :CFBundleVersion\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n\nelse\n    echo \"ERROR: .git folder not found\"\n    exit 1\nfi\n\necho \"========== VERSION SCRIPT END ==========\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
+
 
 /* Begin PBXSourcesBuildPhase section */
 		667709162F48D39F00A97525 /* Sources */ = {
@@ -275,7 +255,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Online Indicator/Online Indicator.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -301,9 +281,10 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "in.bornexplorer.Online-Indicator";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Online Indicator X";
+				INFOPLIST_KEY_CFBundleDisplayName = "Online Indicator X";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -322,7 +303,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Online Indicator/Online Indicator.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -348,9 +329,10 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "in.bornexplorer.Online-Indicator";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Online Indicator X";
+				INFOPLIST_KEY_CFBundleDisplayName = "Online Indicator X";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

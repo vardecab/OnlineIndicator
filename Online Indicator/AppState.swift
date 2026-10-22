@@ -6,6 +6,9 @@ class AppState {
 
     private let networkMonitor = NetworkMonitor()
     private let connectivityChecker = ConnectivityChecker()
+    private let offlineAlert = OfflineAlertManager()
+    private var offlineAlertPolicy = OfflineAlertPolicy()
+    private var checkGeneration = 0
 
     private var refreshTimer: Timer?
     private var debounceTimer: Timer?
@@ -20,6 +23,15 @@ class AppState {
 
     var checkNowResultHandler: ((ConnectionStatus) -> Void)?
 
+    // Test mode is session-only so a relaunch always resumes real monitoring.
+    private(set) var forceOffline = false
+
+    func setForceOffline(_ enabled: Bool) {
+        guard forceOffline != enabled else { return }
+        forceOffline = enabled
+        checkConnection()
+    }
+
     var refreshInterval: TimeInterval {
         let saved = UserDefaults.standard.double(forKey: "refreshInterval")
         return saved == 0 ? 30 : saved
@@ -31,6 +43,8 @@ class AppState {
 
         // Listen for network interface changes (WiFi off, Ethernet unplugged)
         networkMonitor.pathChangedHandler = { [weak self] in
+            // Ignore a probe from the old network while the new path settles.
+            self?.checkGeneration += 1
             self?.debouncedImmediateCheck()
         }
 
@@ -88,20 +102,31 @@ class AppState {
     // MARK: - Core Logic
 
     private func checkConnection(onDemand: Bool = false) {
+        checkGeneration += 1
+        let generation = checkGeneration
 
-        if !networkMonitor.isConnected {
-            let status = ConnectionStatus.noNetwork
-            statusUpdateHandler?(status)
-            if onDemand { checkNowResultHandler?(status) }
+        if forceOffline || !networkMonitor.isConnected {
+            publish(.noNetwork, onDemand: onDemand)
             return
         }
 
         connectivityChecker.checkOutboundConnection { [weak self] reachable in
             DispatchQueue.main.async {
+                guard let self, self.checkGeneration == generation else { return }
                 let status: ConnectionStatus = reachable ? .connected : .blocked
-                self?.statusUpdateHandler?(status)
-                if onDemand { self?.checkNowResultHandler?(status) }
+                self.publish(status, onDemand: onDemand)
             }
         }
+    }
+
+    private func publish(_ status: ConnectionStatus, onDemand: Bool) {
+        if offlineAlertPolicy.record(isConnected: status == .connected) {
+            offlineAlert.show()
+        }
+        if status == .connected {
+            offlineAlert.dismiss()
+        }
+        statusUpdateHandler?(status)
+        if onDemand { checkNowResultHandler?(status) }
     }
 }

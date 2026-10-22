@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var pingURLSaved    = false
     @State private var pingURLInvalid  = false
     @State private var isLaunchEnabled = false
+    @State private var forceOffline = AppState.shared.forceOffline
 
     @State private var leftRightClickEnabled = true
     @State private var leftClickAction       = "wifi"
@@ -35,16 +36,6 @@ struct SettingsView: View {
     @State private var showLocationAlert       = false
     @State private var showLocationDeniedAlert = false
     @State private var showOverrideAlert       = false
-
-    enum UpdateStatus: Equatable {
-        case idle
-        case checking
-        case upToDate
-        case available(tag: String, pageURL: URL)
-        case error(String)
-    }
-    @State private var updateStatus: UpdateStatus = .idle
-    @State private var cachedPageURL: URL? = nil
 
     @State private var connectedSlot  = IconPreferences.slot(for: .connected)
     @State private var blockedSlot    = IconPreferences.slot(for: .blocked)
@@ -69,8 +60,8 @@ struct SettingsView: View {
     ]
 
     private let rightClickOptions: [(label: String, tag: String)] = [
-        ("Online Indicator Settings", "settings"),
-        ("Online Indicator Menu",     "menu")
+        ("Online Indicator X Settings", "settings"),
+        ("Online Indicator X Menu",     "menu")
     ]
 
     private var leftRowLabel:  String { leftRightClickSwapped ? "Right click" : "Left click"  }
@@ -267,7 +258,7 @@ struct SettingsView: View {
                     Button {
                         NSApplication.shared.terminate(nil)
                     } label: {
-                        Label("Quit Online Indicator", systemImage: "power")
+                        Label("Quit Online Indicator X", systemImage: "power")
                             .font(.system(size: 11)).foregroundStyle(.red)
                     }
                     .buttonStyle(.plain)
@@ -279,33 +270,20 @@ struct SettingsView: View {
                             .onChange(of: isLaunchEnabled) { _, v in LoginItemManager.shared.setEnabled(v) }
                     }
 
-                    Divider().padding(.leading, 56)
-
-                    SettingsRow(icon: "arrow.up.circle.fill", iconColor: .blue,
-                                title: "Check for Updates",
-                                subtitle: "Version \(AppInfo.marketingVersion) (Build \(AppInfo.buildVersion))") {
-                        updateControl
-                    }
-
-                    if case .error(let msg) = updateStatus {
-                        HStack(alignment: .top, spacing: 0) {
-                            Spacer().frame(width: 56)
-                            HStack(alignment: .top, spacing: 6) {
-                                Image(systemName: "exclamationmark.circle.fill")
-                                    .foregroundStyle(.red).font(.system(size: 11)).padding(.top, 1)
-                                Text(msg)
-                                    .foregroundStyle(.red).font(.system(size: 11))
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .multilineTextAlignment(.leading)
-                            }
-                            .padding(.trailing, 14)
-                        }
-                        .padding(.bottom, 10)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                    }
                 }
 
                 SettingsSection(title: "Monitoring") {
+
+                    SettingsRow(icon: "wifi.exclamationmark", iconColor: .orange,
+                                title: "Force Offline (Test)",
+                                subtitle: "Simulates failed checks without disconnecting Wi-Fi. Alert appears after two failures. Resets on relaunch.") {
+                        Toggle("Force offline for testing", isOn: $forceOffline).labelsHidden()
+                            .onChange(of: forceOffline) { _, enabled in
+                                AppState.shared.setForceOffline(enabled)
+                            }
+                    }
+
+                    Divider().padding(.leading, 56)
 
                     SettingsRow(icon: "clock.fill", iconColor: .orange,
                                 title: "Check Interval",
@@ -532,55 +510,6 @@ struct SettingsView: View {
         .padding(.leading, 56)
         .padding(.trailing, 14)
         .padding(.bottom, 12)
-    }
-
-    // MARK: - Update control
-
-    @ViewBuilder
-    private var updateControl: some View {
-        Group {
-            switch updateStatus {
-            case .idle:
-                Button("Check") { checkForUpdates() }
-                    .buttonStyle(.bordered).controlSize(.small)
-            case .checking:
-                HStack(spacing: 6) {
-                    ProgressView().controlSize(.small).scaleEffect(0.8)
-                    Text("Checking…").font(.system(size: 12)).foregroundStyle(.secondary)
-                }
-            case .upToDate:
-                HStack(spacing: 4) {
-                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-                    Text("Up to date").foregroundStyle(.green)
-                }.font(.system(size: 12))
-            case .available(let tag, _):
-                VStack(alignment: .trailing, spacing: 4) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                        Text("\(tag) available")
-                            .foregroundStyle(.green)
-                    }
-                    .font(.system(size: 12))
-                    .fixedSize()
-                    Button {
-                        openPageURL()
-                    } label: {
-                        HStack(spacing: 3) {
-                            Text("View on GitHub")
-                            Image(systemName: "arrow.up.right")
-                        }
-                        .font(.system(size: 11, weight: .medium))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
-                }
-            case .error:
-                Button("Retry") { checkForUpdates() }
-                    .buttonStyle(.bordered).controlSize(.small)
-            }
-        }
-        .animation(.easeInOut(duration: 0.2), value: updateStatus)
     }
 
     // MARK: - Appearance Tab
@@ -944,29 +873,7 @@ struct SettingsView: View {
         NotificationCenter.default.post(name: .iconPreferencesChanged, object: nil)
     }
 
-    private func checkForUpdates() {
-        withAnimation { updateStatus = .checking }
-        UpdateChecker.check { result in
-            withAnimation {
-                switch result {
-                case .upToDate:
-                    updateStatus = .upToDate
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) { withAnimation { updateStatus = .idle } }
-                case .updateAvailable(let tag, let page):
-                    cachedPageURL = page
-                    updateStatus = .available(tag: tag, pageURL: page)
-                case .error(let msg):
-                    updateStatus = .error(msg)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) { withAnimation { updateStatus = .idle } }
-                }
-            }
-        }
-    }
 
-    private func openPageURL() {
-        guard let url = cachedPageURL else { return }
-        NSWorkspace.shared.open(url)
-    }
 }
 
 // MARK: - Tab Bar Button

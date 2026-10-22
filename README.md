@@ -72,7 +72,9 @@ required.
 The compact alert uses a pastel red tint over native Liquid Glass on macOS 26
 and later. macOS controls the glass appearance using your system settings,
 including accessibility adjustments. Earlier macOS versions use a native
-vibrancy background with the same tint.
+vibrancy background with the same color wash. The window fits its content with
+14-point horizontal and 12-point vertical padding. Its icon and color match the
+menu bar's current connection state, including your appearance customizations.
 
 A failed internet probe or an unavailable network counts as a failure. Manual
 checks also count. Checks use your configured monitoring interval, so alert and

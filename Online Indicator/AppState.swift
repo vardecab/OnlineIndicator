@@ -121,10 +121,12 @@ class AppState {
 
     private func publish(_ status: ConnectionStatus, onDemand: Bool) {
         if offlineAlertPolicy.record(isConnected: status == .connected) {
-            offlineAlert.show()
+            offlineAlert.show(status: status)
         }
         if status == .connected {
             offlineAlert.dismiss()
+        } else {
+            offlineAlert.update(status: status)
         }
         statusUpdateHandler?(status)
         if onDemand { checkNowResultHandler?(status) }

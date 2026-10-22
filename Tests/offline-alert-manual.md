@@ -25,9 +25,10 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
     until actual recovery.
 11. Quit and relaunch while test mode is on. Confirm that test mode is off and
     real connectivity monitoring resumes.
-12. On macOS 26+, confirm that the alert is compact (320×88), has a soft red glass
-    background, and shows the desktop through the native material. Check it over
-    both light and dark windows and in both system appearances.
+12. On macOS 26+, confirm that the alert fits its icon, text, and arrow with modest
+    padding, with no excess blank area. Confirm that its background is visibly
+    pastel red while retaining native glass. Check it over both light and dark
+    windows and in both system appearances.
 13. While the alert is visible, change the system Liquid Glass appearance (where
     available), Reduce Transparency, and Increase Contrast. Confirm that the
     material follows macOS preferences and the label remains readable.
@@ -37,3 +38,8 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
     `./build-and-run.sh`, then open `/Applications/Online Indicator X.app` in Finder.
     Confirm that X launches independently, with its own settings and menu bar item.
     Repeat after quitting both apps. The original must not launch when opening X.
+16. With Force Offline enabled, compare the alert's icon and color to the menu bar.
+    Change the No Network icon and color in Appearance while the alert is visible;
+    both should update. Also test an internet probe failure with a working network
+    interface: the alert must match the Blocked icon and color. Changing between
+    Blocked and No Network during an outage should update the alert's icon.

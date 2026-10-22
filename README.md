@@ -75,8 +75,8 @@ including accessibility adjustments. Earlier macOS versions use a native
 vibrancy background with the same color wash. The window fits its content with
 14-point horizontal and 12-point vertical padding. Its icon and color match the
 menu bar's current connection state, including your appearance customizations.
-The entire alert gently pulses while visible, with an outline in the icon's
-color. Reduce Motion keeps the window steady. Connection changes update the menu bar icon
+The entire alert expands and contracts in a repeating double heartbeat, with an
+outline in the icon's color. Reduce Motion keeps the window steady. Connection changes update the menu bar icon
 without showing additional status popovers.
 
 Choose **Settings → General → Offline Alert → Position** to place it under the

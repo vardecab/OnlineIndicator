@@ -60,10 +60,12 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
     bar icon. A manual Check Connection Now should dismiss its Checking popover
     when complete without showing a status popover.
 21. With the alert visible, confirm that its outline matches the icon's configured
-    color and the entire window gently pulses over roughly 3 seconds without
-    moving the text or resizing the window. Change the icon color and confirm the
+    color and the entire alert expands and contracts in a double heartbeat every
+    1.8 seconds (7% on the first beat, 4% on the second). Confirm that the text,
+    background, and border scale together, with no clipping or text reflow, in
+    every screen position. Change the icon color and confirm the
     outline follows. Enable Reduce Motion while the alert is visible: the whole
-    window should become steady. Disable Reduce Motion: the pulse should resume. Confirm the
+    window should become steady. Disable Reduce Motion: the heartbeat should resume. Confirm the
     entire alert still opens Wi-Fi settings when clicked.
 22. Check that Dev Flags shows “Force Offline” and uses the configured No Network
     icon and color. Customize the icon in Appearance and verify that the flag and

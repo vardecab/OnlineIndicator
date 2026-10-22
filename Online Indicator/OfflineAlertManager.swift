@@ -1,8 +1,10 @@
 import AppKit
 import SwiftUI
+import QuartzCore
 
 private enum OfflineAlertLayout {
     static let cornerRadius: CGFloat = 14
+    static let maximumScale: CGFloat = 1.07
     static let tint = NSColor(srgbRed: 1, green: 0.6, blue: 0.6, alpha: 0.65)
 }
 
@@ -11,7 +13,7 @@ final class OfflineAlertManager: NSObject {
     private var panel: NSPanel?
     private var displayObservers: [NSObjectProtocol] = []
     private var accessibilityObserver: NSObjectProtocol?
-    private var pulseTimer: Timer?
+    private weak var pulseView: NSView?
     private var displayedStatus: AppState.ConnectionStatus = .noNetwork
 
     func show(status: AppState.ConnectionStatus) {
@@ -60,8 +62,7 @@ final class OfflineAlertManager: NSObject {
         content.frame = frame
         content.autoresizingMask = [.width, .height]
 
-        // A native button covers the full surface, including padding and empty
-        // space, and accepts the first click while another app is active.
+        // Keep the text and icon above the tint, inside the native material.
         let surface = NSView(frame: frame)
         surface.autoresizingMask = [.width, .height]
         // Native glass tint can be very subtle. A light color wash keeps the
@@ -74,13 +75,6 @@ final class OfflineAlertManager: NSObject {
         surface.addSubview(wash)
         surface.addSubview(content)
         content.setAccessibilityHidden(true)
-        let button = OfflineAlertButton(title: "", target: self, action: #selector(openWiFiSettings))
-        button.frame = frame
-        button.autoresizingMask = [.width, .height]
-        button.isBordered = false
-        button.focusRingType = .none
-        button.setAccessibilityLabel("Network is offline. Open Wi-Fi settings to switch to a mobile hotspot or another connection.")
-        surface.addSubview(button)
 
         if #available(macOS 26.0, *) {
             // macOS controls the native glass and its accessibility adjustments.
@@ -88,7 +82,7 @@ final class OfflineAlertManager: NSObject {
             glass.cornerRadius = OfflineAlertLayout.cornerRadius
             glass.tintColor = OfflineAlertLayout.tint
             glass.contentView = surface
-            return glass
+            return makePulseCanvas(glass)
         }
 
         // Keep the existing macOS 14.6 minimum with a native vibrancy fallback.
@@ -101,7 +95,32 @@ final class OfflineAlertManager: NSObject {
         material.layer?.masksToBounds = true
 
         material.addSubview(surface)
-        return material
+        return makePulseCanvas(material)
+    }
+
+    private func makePulseCanvas(_ material: NSView) -> NSView {
+        // Reserve the expansion area so the glass and outline never get clipped.
+        let size = material.frame.size
+        let insetX = ceil(size.width * (OfflineAlertLayout.maximumScale - 1) / 2) + 2
+        let insetY = ceil(size.height * (OfflineAlertLayout.maximumScale - 1) / 2) + 2
+        let canvas = NSView(frame: NSRect(
+            x: 0, y: 0, width: size.width + insetX * 2, height: size.height + insetY * 2
+        ))
+        material.setFrameOrigin(NSPoint(x: insetX, y: insetY))
+        material.wantsLayer = true
+        canvas.addSubview(material)
+        pulseView = material
+
+        // Cover the whole expansion area, keeping every visible part clickable
+        // throughout the animation, even while another app is active.
+        let button = OfflineAlertButton(title: "", target: self, action: #selector(openWiFiSettings))
+        button.frame = canvas.bounds
+        button.autoresizingMask = [.width, .height]
+        button.isBordered = false
+        button.focusRingType = .none
+        button.setAccessibilityLabel("Network is offline. Open Wi-Fi settings to switch to a mobile hotspot or another connection.")
+        canvas.addSubview(button)
+        return canvas
     }
 
     func update(status: AppState.ConnectionStatus) {
@@ -111,6 +130,7 @@ final class OfflineAlertManager: NSObject {
         panel.contentView = contentView
         panel.setContentSize(contentView.frame.size)
         positionPanel()
+        startPulse()
     }
 
     @objc private func openWiFiSettings() {
@@ -120,26 +140,32 @@ final class OfflineAlertManager: NSObject {
     }
 
     private func startPulse() {
-        pulseTimer?.invalidate()
-        pulseTimer = nil
-        panel?.alphaValue = 1
-        guard panel != nil, !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return }
+        guard let view = pulseView, let layer = view.layer else { return }
+        layer.removeAnimation(forKey: "offlineHeartbeat")
+        guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return }
 
-        let startedAt = ProcessInfo.processInfo.systemUptime
-        let timer = Timer(timeInterval: 1.0 / 30, repeats: true) { [weak self] _ in
-            guard let panel = self?.panel else { return }
-            let elapsed = ProcessInfo.processInfo.systemUptime - startedAt
-            // A slow, shallow fade affects the entire window, including native
-            // glass, text, icon and outline, without changing its click target.
-            panel.alphaValue = CGFloat(0.95 + 0.05 * cos(elapsed * 2 * .pi / 3.2))
+        // Scale about the visual center without changing AppKit's layer anchor,
+        // window geometry, text layout, or the native glass implementation.
+        let centerX = (0.5 - layer.anchorPoint.x) * layer.bounds.width
+        let centerY = (0.5 - layer.anchorPoint.y) * layer.bounds.height
+        let scales: [CGFloat] = [1, OfflineAlertLayout.maximumScale, 1, 1.04, 1, 1]
+        let beat = CAKeyframeAnimation(keyPath: "transform")
+        beat.values = scales.map { scale in
+            var transform = CATransform3DMakeTranslation(centerX, centerY, 0)
+            transform = CATransform3DScale(transform, scale, scale, 1)
+            transform = CATransform3DTranslate(transform, -centerX, -centerY, 0)
+            return NSValue(caTransform3D: transform)
         }
-        pulseTimer = timer
-        RunLoop.main.add(timer, forMode: .common)
+        beat.keyTimes = [0, 0.12, 0.26, 0.40, 0.58, 1]
+        beat.timingFunctions = Array(repeating: CAMediaTimingFunction(name: .easeInEaseOut), count: 5)
+        beat.duration = 1.8
+        beat.repeatCount = .infinity
+        layer.add(beat, forKey: "offlineHeartbeat")
     }
 
     func dismiss() {
-        pulseTimer?.invalidate()
-        pulseTimer = nil
+        pulseView?.layer?.removeAnimation(forKey: "offlineHeartbeat")
+        pulseView = nil
         panel?.orderOut(nil)
         panel = nil
         for observer in displayObservers {
@@ -164,7 +190,6 @@ final class OfflineAlertManager: NSObject {
     }
 
     deinit {
-        pulseTimer?.invalidate()
         for observer in displayObservers {
             NotificationCenter.default.removeObserver(observer)
         }

@@ -33,3 +33,7 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
     material follows macOS preferences and the label remains readable.
 14. On macOS 14.6–15, confirm that the tinted vibrancy fallback appears correctly
     and that the same click and automatic dismissal behaviors still work.
+15. Keep the original Online Indicator installed and running. Run
+    `./build-and-run.sh`, then open `/Applications/Online Indicator X.app` in Finder.
+    Confirm that X launches independently, with its own settings and menu bar item.
+    Repeat after quitting both apps. The original must not launch when opening X.

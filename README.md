@@ -99,6 +99,11 @@ account required), verifies its signature, replaces any existing
 before replacement. If `/Applications` needs administrator access, `sudo` will
 request your password for installation. Build output stays in `build/DerivedData`.
 
+Online Indicator X uses its own bundle identifier, `com.vardecab.OnlineIndicatorX`,
+so macOS distinguishes it from the original Online Indicator. Preferences,
+launch-at-login registration, and permissions are separate. Rebuild and reinstall
+with the script to replace an older X build that shared the original app's identity.
+
 The current version is **1.5.1 (build 3)**. Versions follow SemVer
 (`MAJOR.MINOR.PATCH`); the separate numeric build number identifies the build.
 Update `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in both Debug and Release

@@ -15,6 +15,7 @@ fi
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 derived_data="$script_dir/build/DerivedData"
 app_name="Online Indicator X.app"
+expected_bundle_id="com.vardecab.OnlineIndicatorX"
 built_app="$derived_data/Build/Products/Release/$app_name"
 installed_app="/Applications/$app_name"
 
@@ -35,6 +36,11 @@ if [[ ! -x "$built_app/Contents/MacOS/Online Indicator X" ]]; then
     exit 1
 fi
 /usr/bin/codesign --verify --deep --strict "$built_app"
+built_bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$built_app/Contents/Info.plist")"
+if [[ "$built_bundle_id" != "$expected_bundle_id" ]]; then
+    echo "Refusing to install an app with unexpected bundle ID: $built_bundle_id" >&2
+    exit 1
+fi
 
 # Elevate only the installation commands if /Applications is not writable.
 install_command() {

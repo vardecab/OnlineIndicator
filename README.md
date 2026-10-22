@@ -77,9 +77,11 @@ vibrancy background with the same color wash. The window fits its content with
 menu bar's current connection state, including your appearance customizations.
 
 A failed internet probe or an unavailable network counts as a failure. Manual
-checks also count. Checks use your configured monitoring interval, so alert and
-recovery timing depend on that interval. A successful check resets the counter
-for the next outage.
+checks also count. Checks use your configured monitoring interval until the alert
+appears. While it is visible, checks run every **3 seconds** to detect recovery
+quickly, with a 2.5-second timeout per probe. A successful check hides the alert,
+resets the failure counter, and restores your configured interval. Your saved
+interval is never changed, even if you edit it during an outage.
 
 To test without disconnecting, enable **Settings → General → Monitoring → Force
 Offline (Test)**. This immediately records a failed check; the next check uses

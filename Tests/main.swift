@@ -5,8 +5,13 @@
 func expectAlerts(_ checks: [Bool], _ expected: [Int]) {
     var policy = OfflineAlertPolicy()
     var alerts: [Int] = []
+    var expectedActive = false
     for (index, connected) in checks.enumerated() {
         if policy.record(isConnected: connected) { alerts.append(index) }
+        if connected { expectedActive = false }
+        else if expected.contains(index) { expectedActive = true }
+        precondition(policy.isAlertActive == expectedActive,
+                     "Unexpected alert/recovery polling state at check \(index)")
     }
     precondition(alerts == expected, "Expected alerts at \(expected), got \(alerts)")
 }

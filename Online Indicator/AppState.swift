@@ -78,10 +78,14 @@ class AppState {
         refreshTimer?.invalidate()
 
         refreshTimer = Timer.scheduledTimer(
-            withTimeInterval: refreshInterval,
+            withTimeInterval: offlineAlertPolicy.isAlertActive ? 3 : refreshInterval,
             repeats: true
         ) { [weak self] _ in
             self?.checkConnection()
+        }
+        if let refreshTimer {
+            // Keep recovery checks running while a menu is tracking mouse input.
+            RunLoop.main.add(refreshTimer, forMode: .common)
         }
     }
 
@@ -110,7 +114,7 @@ class AppState {
             return
         }
 
-        connectivityChecker.checkOutboundConnection { [weak self] reachable in
+        connectivityChecker.checkOutboundConnection(fastRecovery: offlineAlertPolicy.isAlertActive) { [weak self] reachable in
             DispatchQueue.main.async {
                 guard let self, self.checkGeneration == generation else { return }
                 let status: ConnectionStatus = reachable ? .connected : .blocked
@@ -120,6 +124,7 @@ class AppState {
     }
 
     private func publish(_ status: ConnectionStatus, onDemand: Bool) {
+        let wasAlertActive = offlineAlertPolicy.isAlertActive
         if offlineAlertPolicy.record(isConnected: status == .connected) {
             offlineAlert.show(status: status)
         }
@@ -127,6 +132,11 @@ class AppState {
             offlineAlert.dismiss()
         } else {
             offlineAlert.update(status: status)
+        }
+        if wasAlertActive != offlineAlertPolicy.isAlertActive {
+            // Switch cadence only when the alert appears or connectivity returns.
+            // The user's saved preference is never overwritten.
+            startTimer()
         }
         statusUpdateHandler?(status)
         if onDemand { checkNowResultHandler?(status) }

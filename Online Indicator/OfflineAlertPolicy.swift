@@ -2,6 +2,8 @@
 struct OfflineAlertPolicy {
     private var consecutiveFailures = 0
 
+    var isAlertActive: Bool { consecutiveFailures >= 2 }
+
     mutating func record(isConnected: Bool) -> Bool {
         if isConnected {
             consecutiveFailures = 0

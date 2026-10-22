@@ -11,17 +11,20 @@ class ConnectivityChecker {
 
     private var currentTask: URLSessionDataTask?
 
-    private let session: URLSession = {
+    private let session = ConnectivityChecker.makeSession(timeout: 5)
+    private let recoverySession = ConnectivityChecker.makeSession(timeout: 2.5)
+
+    private static func makeSession(timeout: TimeInterval) -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForRequest = 5
-        configuration.timeoutIntervalForResource = 5
+        configuration.timeoutIntervalForRequest = timeout
+        configuration.timeoutIntervalForResource = timeout
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.httpMaximumConnectionsPerHost = 1
         configuration.httpAdditionalHeaders = ["Connection": "close"]
         return URLSession(configuration: configuration)
-    }()
+    }
 
-    func checkOutboundConnection(completion: @escaping (Bool) -> Void) {
+    func checkOutboundConnection(fastRecovery: Bool = false, completion: @escaping (Bool) -> Void) {
 
         print("Attempting outbound connection to:", Self.monitoringURLString)
 
@@ -35,9 +38,12 @@ class ConnectivityChecker {
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.timeoutInterval = 5
+        // Finish recovery probes before the next 3-second tick, rather than
+        // repeatedly cancelling a 5-second probe before it can complete.
+        request.timeoutInterval = fastRecovery ? 2.5 : 5
 
-        let task = session.dataTask(with: request) { [weak self] _, response, error in
+        let activeSession = fastRecovery ? recoverySession : session
+        let task = activeSession.dataTask(with: request) { [weak self] _, response, error in
 
             if let urlError = error as? URLError, urlError.code == .cancelled {
 

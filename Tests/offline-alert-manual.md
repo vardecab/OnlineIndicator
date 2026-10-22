@@ -43,3 +43,15 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
     both should update. Also test an internet probe failure with a working network
     interface: the alert must match the Blocked icon and color. Changing between
     Blocked and No Network during an outage should update the alert's icon.
+17. Set the check interval to 60 seconds, enable Force Offline, and wait for the
+    alert (or trigger a second check manually). With the alert visible, disable
+    Force Offline while the real connection is unavailable. Restore internet
+    access without changing the network interface. Confirm that recovery probes
+    start every 3 seconds and the next successful check hides the alert. Verify
+    that normal checks return to every 60 seconds and Settings still shows 60.
+18. While the alert is visible, change the configured interval to 30 seconds.
+    Confirm that recovery checks still run every 3 seconds; after recovery, normal
+    checks must use the new 30-second interval. Repeat through a second outage.
+19. Use an endpoint that never responds. Confirm that recovery requests time out
+    after 2.5 seconds rather than being cancelled by the next timer tick. Keep the
+    menu open and confirm that recovery checks continue.

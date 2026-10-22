@@ -69,6 +69,11 @@ macOS Network settings so you can switch to a mobile hotspot or another connecti
 the alert stays visible until connectivity returns. No notification permission is
 required.
 
+The compact alert uses a pastel red tint over native Liquid Glass on macOS 26
+and later. macOS controls the glass appearance using your system settings,
+including accessibility adjustments. Earlier macOS versions use a native
+vibrancy background with the same tint.
+
 A failed internet probe or an unavailable network counts as a failure. Manual
 checks also count. Checks use your configured monitoring interval, so alert and
 recovery timing depend on that interval. A successful check resets the counter

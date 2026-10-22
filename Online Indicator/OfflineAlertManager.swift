@@ -1,6 +1,12 @@
 import AppKit
 import SwiftUI
 
+private enum OfflineAlertLayout {
+    static let size = NSSize(width: 320, height: 88)
+    static let cornerRadius: CGFloat = 14
+    static let tint = NSColor(srgbRed: 1, green: 0.65, blue: 0.65, alpha: 0.35)
+}
+
 /// Keeps the outage visible without taking focus from the current app.
 final class OfflineAlertManager {
     private var panel: NSPanel?
@@ -10,7 +16,7 @@ final class OfflineAlertManager {
         guard panel == nil else { return }
 
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 360, height: 148),
+            contentRect: NSRect(origin: .zero, size: OfflineAlertLayout.size),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -23,7 +29,7 @@ final class OfflineAlertManager {
         panel.backgroundColor = .clear
         panel.isOpaque = false
         panel.hasShadow = true
-        panel.contentView = NSHostingView(rootView: OfflineAlertView())
+        panel.contentView = makeContentView()
         self.panel = panel
         positionPanel()
         panel.orderFrontRegardless()
@@ -35,6 +41,40 @@ final class OfflineAlertManager {
         ) { [weak self] _ in
             self?.positionPanel()
         }
+    }
+
+    private func makeContentView() -> NSView {
+        let frame = NSRect(origin: .zero, size: OfflineAlertLayout.size)
+        let content = NSHostingView(rootView: OfflineAlertView())
+        content.frame = frame
+        content.autoresizingMask = [.width, .height]
+
+        if #available(macOS 26.0, *) {
+            // Use the system material directly: macOS controls its glass appearance
+            // and accessibility adjustments. Avoid a fixed blur or opacity layer.
+            let glass = NSGlassEffectView(frame: frame)
+            glass.cornerRadius = OfflineAlertLayout.cornerRadius
+            glass.tintColor = OfflineAlertLayout.tint
+            glass.contentView = content
+            return glass
+        }
+
+        // Keep the existing macOS 14.6 minimum with a native vibrancy fallback.
+        let material = NSVisualEffectView(frame: frame)
+        material.material = .hudWindow
+        material.blendingMode = .behindWindow
+        material.state = .active
+        material.wantsLayer = true
+        material.layer?.cornerRadius = OfflineAlertLayout.cornerRadius
+        material.layer?.masksToBounds = true
+
+        let tint = NSView(frame: frame)
+        tint.autoresizingMask = [.width, .height]
+        tint.wantsLayer = true
+        tint.layer?.backgroundColor = OfflineAlertLayout.tint.cgColor
+        material.addSubview(tint)
+        material.addSubview(content)
+        return material
     }
 
     func dismiss() {
@@ -65,29 +105,32 @@ final class OfflineAlertManager {
 private struct OfflineAlertView: View {
     var body: some View {
         Button(action: openNetworkSettings) {
-            HStack(alignment: .top, spacing: 12) {
+            HStack(spacing: 12) {
                 Image(systemName: "wifi.exclamationmark")
-                    .font(.system(size: 24, weight: .medium))
-                    .foregroundStyle(.orange)
+                    .font(.system(size: 22, weight: .medium))
+                    .foregroundStyle(.primary)
                     .accessibilityHidden(true)
 
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 5) {
                     Text("Network is offline")
-                        .font(.headline)
-                    Text("Switch to a mobile hotspot or another connection.")
-                        .font(.subheadline)
+                        .font(.system(size: 13, weight: .semibold))
                     Text("Open Network Settings…")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.accentColor)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
             }
-            .padding(20)
-            .frame(width: 360, height: 148, alignment: .leading)
+            .padding(16)
+            .frame(width: OfflineAlertLayout.size.width,
+                   height: OfflineAlertLayout.size.height, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
         .accessibilityLabel("Network is offline. Open Network settings to switch to a mobile hotspot or another connection.")
     }
 

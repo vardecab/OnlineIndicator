@@ -23,3 +23,11 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
     until actual recovery.
 11. Quit and relaunch while test mode is on. Confirm that test mode is off and
     real connectivity monitoring resumes.
+12. On macOS 26+, confirm that the alert is compact (320×88), has a soft red glass
+    background, and shows the desktop through the native material. Check it over
+    both light and dark windows and in both system appearances.
+13. While the alert is visible, change the system Liquid Glass appearance (where
+    available), Reduce Transparency, and Increase Contrast. Confirm that the
+    material follows macOS preferences and the label remains readable.
+14. On macOS 14.6–15, confirm that the tinted vibrancy fallback appears correctly
+    and that the same click and automatic dismissal behaviors still work.

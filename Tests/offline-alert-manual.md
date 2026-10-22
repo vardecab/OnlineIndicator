@@ -8,7 +8,9 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
    at the top right without taking focus from the current app.
 3. Leave the network offline for several more checks. Confirm that the alert stays
    visible, including when switching apps, desktops, and a full-screen app.
-4. Click the alert. Confirm that Network settings opens and the alert stays visible.
+4. With another app active, click the alert's icon, title, subtitle, arrow,
+   padding, and empty space in separate attempts. Each first click must open
+   Wi-Fi settings directly, and the alert must stay visible.
 5. Connect to a working hotspot. Confirm that the next successful check hides the
    alert without requiring a click.
 6. Disconnect again. Confirm that two new failed checks show the alert again.

@@ -8,7 +8,7 @@ private enum OfflineAlertLayout {
 }
 
 /// Keeps the outage visible without taking focus from the current app.
-final class OfflineAlertManager {
+final class OfflineAlertManager: NSObject {
     private var panel: NSPanel?
     private var screenObserver: NSObjectProtocol?
 
@@ -49,13 +49,27 @@ final class OfflineAlertManager {
         content.frame = frame
         content.autoresizingMask = [.width, .height]
 
+        // A native button covers the full surface, including padding and empty
+        // space, and accepts the first click while another app is active.
+        let surface = NSView(frame: frame)
+        surface.autoresizingMask = [.width, .height]
+        surface.addSubview(content)
+        content.setAccessibilityHidden(true)
+        let button = OfflineAlertButton(title: "", target: self, action: #selector(openWiFiSettings))
+        button.frame = frame
+        button.autoresizingMask = [.width, .height]
+        button.isBordered = false
+        button.focusRingType = .none
+        button.setAccessibilityLabel("Network is offline. Open Wi-Fi settings to switch to a mobile hotspot or another connection.")
+        surface.addSubview(button)
+
         if #available(macOS 26.0, *) {
             // Use the system material directly: macOS controls its glass appearance
             // and accessibility adjustments. Avoid a fixed blur or opacity layer.
             let glass = NSGlassEffectView(frame: frame)
             glass.cornerRadius = OfflineAlertLayout.cornerRadius
             glass.tintColor = OfflineAlertLayout.tint
-            glass.contentView = content
+            glass.contentView = surface
             return glass
         }
 
@@ -73,8 +87,14 @@ final class OfflineAlertManager {
         tint.wantsLayer = true
         tint.layer?.backgroundColor = OfflineAlertLayout.tint.cgColor
         material.addSubview(tint)
-        material.addSubview(content)
+        material.addSubview(surface)
         return material
+    }
+
+    @objc private func openWiFiSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.wifi-settings-extension") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     func dismiss() {
@@ -102,41 +122,33 @@ final class OfflineAlertManager {
     }
 }
 
+/// Allow one click anywhere on the alert even when its panel is inactive.
+private final class OfflineAlertButton: NSButton {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+}
+
 private struct OfflineAlertView: View {
     var body: some View {
-        Button(action: openNetworkSettings) {
-            HStack(spacing: 12) {
-                Image(systemName: "wifi.exclamationmark")
-                    .font(.system(size: 22, weight: .medium))
-                    .foregroundStyle(.primary)
-                    .accessibilityHidden(true)
+        HStack(spacing: 12) {
+            Image(systemName: "wifi.exclamationmark")
+                .font(.system(size: 22, weight: .medium))
+                .foregroundStyle(.primary)
 
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("Network is offline")
-                        .font(.system(size: 13, weight: .semibold))
-                    Text("Open Network Settings…")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Image(systemName: "arrow.up.right")
-                    .font(.system(size: 12, weight: .medium))
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Network is offline")
+                    .font(.system(size: 13, weight: .semibold))
+                Text("Open Wi-Fi Settings…")
+                    .font(.system(size: 12))
                     .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
             }
-            .padding(16)
-            .frame(width: OfflineAlertLayout.size.width,
-                   height: OfflineAlertLayout.size.height, alignment: .leading)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Network is offline. Open Network settings to switch to a mobile hotspot or another connection.")
-    }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-    private func openNetworkSettings() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.Network-Settings.extension") {
-            NSWorkspace.shared.open(url)
+            Image(systemName: "arrow.up.right")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(.secondary)
         }
+        .padding(16)
+        .frame(width: OfflineAlertLayout.size.width,
+               height: OfflineAlertLayout.size.height, alignment: .leading)
     }
 }

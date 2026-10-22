@@ -64,8 +64,8 @@ Set custom keyboard shortcuts to quickly toggle Wi Fi, open Wi Fi settings, and 
 
 A custom alert appears in the top-right corner after two consecutive failed
 connectivity checks. It stays visible across desktops while the network is
-offline and disappears automatically after a successful check. Clicking it opens
-macOS Network settings so you can switch to a mobile hotspot or another connection;
+offline and disappears automatically after a successful check. Clicking anywhere on the alert opens
+macOS Wi-Fi settings so you can switch to a mobile hotspot or another connection;
 the alert stays visible until connectivity returns. No notification permission is
 required.
 

@@ -1,4 +1,5 @@
 import Foundation
+import CoreGraphics
 
 enum OfflineAlertPosition: String, CaseIterable, Identifiable {
     case topLeft, topCenter, topRight, center, bottomLeft, bottomCenter, bottomRight

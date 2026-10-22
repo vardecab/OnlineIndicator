@@ -2,6 +2,7 @@
 // swiftc 'Online Indicator/OfflineAlertPolicy.swift' 'Online Indicator/OfflineAlertPosition.swift' Tests/main.swift -o /tmp/online-indicator-policy-tests
 // /tmp/online-indicator-policy-tests
 import Foundation
+import CoreGraphics
 
 func expectAlerts(_ checks: [Bool], _ expected: [Int]) {
     var policy = OfflineAlertPolicy()

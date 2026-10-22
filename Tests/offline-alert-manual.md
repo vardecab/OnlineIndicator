@@ -17,7 +17,7 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
 7. Check that a single failure followed by recovery never shows the alert.
 8. Disconnect an external display while the alert is visible. Confirm that the
    alert remains visible on an attached display.
-9. With a working internet connection, enable **Settings → General → Monitoring →
+9. With a working internet connection, enable **Settings → General → Dev Flags →
    Force Offline (Test)**. Confirm that Wi-Fi still works in other apps, the menu
    bar shows offline, and the alert appears after the second failed check.
 10. Disable test mode. Confirm that a successful real check hides the alert.

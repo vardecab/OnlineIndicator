@@ -83,7 +83,7 @@ quickly, with a 2.5-second timeout per probe. A successful check hides the alert
 resets the failure counter, and restores your configured interval. Your saved
 interval is never changed, even if you edit it during an outage.
 
-To test without disconnecting, enable **Settings → General → Monitoring → Force
+To test without disconnecting, enable **Settings → General → Dev Flags → Force
 Offline (Test)**. This immediately records a failed check; the next check uses
 the configured interval and triggers the alert after the second failure. Turn
 the toggle off to check the real connection again; a successful result hides the

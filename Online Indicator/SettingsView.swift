@@ -274,17 +274,6 @@ struct SettingsView: View {
 
                 SettingsSection(title: "Monitoring") {
 
-                    SettingsRow(icon: "wifi.exclamationmark", iconColor: .orange,
-                                title: "Force Offline (Test)",
-                                subtitle: "Simulates failed checks without disconnecting Wi-Fi. Alert appears after two failures. Resets on relaunch.") {
-                        Toggle("Force offline for testing", isOn: $forceOffline).labelsHidden()
-                            .onChange(of: forceOffline) { _, enabled in
-                                AppState.shared.setForceOffline(enabled)
-                            }
-                    }
-
-                    Divider().padding(.leading, 56)
-
                     SettingsRow(icon: "clock.fill", iconColor: .orange,
                                 title: "Check Interval",
                                 subtitle: "How often the app checks if you're connected") {
@@ -434,6 +423,17 @@ struct SettingsView: View {
                         onIPv4Changed: { UserDefaults.standard.set(hideIPv4, forKey: "hideIPv4") },
                         onIPv6Changed: { UserDefaults.standard.set(hideIPv6, forKey: "hideIPv6") }
                     )
+                }
+
+                SettingsSection(title: "Dev Flags") {
+                    SettingsRow(icon: "wifi.exclamationmark", iconColor: .orange,
+                                title: "Force Offline (Test)",
+                                subtitle: "Simulates failed checks without disconnecting Wi-Fi. Alert appears after two failures. Resets on relaunch.") {
+                        Toggle("Force offline for testing", isOn: $forceOffline).labelsHidden()
+                            .onChange(of: forceOffline) { _, enabled in
+                                AppState.shared.setForceOffline(enabled)
+                            }
+                    }
                 }
             }
             .padding(20)

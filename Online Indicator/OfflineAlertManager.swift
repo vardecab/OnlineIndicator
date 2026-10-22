@@ -9,7 +9,9 @@ private enum OfflineAlertLayout {
 /// Keeps the outage visible without taking focus from the current app.
 final class OfflineAlertManager: NSObject {
     private var panel: NSPanel?
-    private var screenObserver: NSObjectProtocol?
+    private var displayObservers: [NSObjectProtocol] = []
+    private var accessibilityObserver: NSObjectProtocol?
+    private var pulseTimer: Timer?
     private var displayedStatus: AppState.ConnectionStatus = .noNetwork
 
     func show(status: AppState.ConnectionStatus) {
@@ -36,13 +38,20 @@ final class OfflineAlertManager: NSObject {
         positionPanel()
         panel.orderFrontRegardless()
 
-        screenObserver = NotificationCenter.default.addObserver(
-            forName: NSApplication.didChangeScreenParametersNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.positionPanel()
+        for name in [NSApplication.didChangeScreenParametersNotification, .offlineAlertPositionChanged] {
+            displayObservers.append(NotificationCenter.default.addObserver(
+                forName: name, object: nil, queue: .main
+            ) { [weak self] _ in
+                self?.positionPanel()
+            })
         }
+        accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.startPulse()
+        }
+        startPulse()
     }
 
     private func makeContentView() -> NSView {
@@ -110,27 +119,57 @@ final class OfflineAlertManager: NSObject {
         }
     }
 
+    private func startPulse() {
+        pulseTimer?.invalidate()
+        pulseTimer = nil
+        panel?.alphaValue = 1
+        guard panel != nil, !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return }
+
+        let startedAt = ProcessInfo.processInfo.systemUptime
+        let timer = Timer(timeInterval: 1.0 / 30, repeats: true) { [weak self] _ in
+            guard let panel = self?.panel else { return }
+            let elapsed = ProcessInfo.processInfo.systemUptime - startedAt
+            // A slow, shallow fade affects the entire window, including native
+            // glass, text, icon and outline, without changing its click target.
+            panel.alphaValue = CGFloat(0.95 + 0.05 * cos(elapsed * 2 * .pi / 3.2))
+        }
+        pulseTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+    }
+
     func dismiss() {
+        pulseTimer?.invalidate()
+        pulseTimer = nil
         panel?.orderOut(nil)
         panel = nil
-        if let screenObserver {
-            NotificationCenter.default.removeObserver(screenObserver)
-            self.screenObserver = nil
+        for observer in displayObservers {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        displayObservers.removeAll()
+        if let accessibilityObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver)
+            self.accessibilityObserver = nil
         }
     }
 
     private func positionPanel() {
-        guard let panel, let screen = panel.screen ?? NSScreen.main else { return }
-        let visibleFrame = screen.visibleFrame
-        panel.setFrameTopLeftPoint(NSPoint(
-            x: visibleFrame.maxX - panel.frame.width - 16,
-            y: visibleFrame.maxY - 16
+        guard let panel, let screen = NSScreen.screens.first ?? NSScreen.main else { return }
+        var usableFrame = screen.visibleFrame
+        // Avoid the notch even when the menu bar is hidden.
+        let safeTop = min(usableFrame.maxY, screen.frame.maxY - screen.safeAreaInsets.top)
+        usableFrame.size.height = max(0, safeTop - usableFrame.minY)
+        panel.setFrameOrigin(OfflineAlertPosition.current.origin(
+            in: usableFrame, alertSize: panel.frame.size
         ))
     }
 
     deinit {
-        if let screenObserver {
-            NotificationCenter.default.removeObserver(screenObserver)
+        pulseTimer?.invalidate()
+        for observer in displayObservers {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let accessibilityObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver)
         }
     }
 }
@@ -177,34 +216,13 @@ private struct OfflineAlertView: View {
         .padding(.vertical, 12)
         .fixedSize()
         .overlay {
-            OfflineAlertOutline(color: Color(nsColor: icon.color))
+            RoundedRectangle(cornerRadius: OfflineAlertLayout.cornerRadius)
+                .strokeBorder(Color(nsColor: icon.color), lineWidth: 1.5)
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
         }
         .onReceive(NotificationCenter.default.publisher(for: .iconPreferencesChanged)) { _ in
             slot = IconPreferences.slot(for: status)
-        }
-    }
-}
-
-private struct OfflineAlertOutline: View {
-    let color: Color
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var outline: some View {
-        RoundedRectangle(cornerRadius: OfflineAlertLayout.cornerRadius)
-            .strokeBorder(color, lineWidth: 1.5)
-    }
-
-    var body: some View {
-        if reduceMotion {
-            outline
-        } else {
-            outline.phaseAnimator([false, true]) { content, emphasized in
-                content.opacity(emphasized ? 1 : 0.5)
-            } animation: { _ in
-                .easeInOut(duration: 1.6)
-            }
         }
     }
 }

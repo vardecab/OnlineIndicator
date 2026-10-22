@@ -18,7 +18,7 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
 8. Disconnect an external display while the alert is visible. Confirm that the
    alert remains visible on an attached display.
 9. With a working internet connection, enable **Settings → General → Dev Flags →
-   Force Offline (Test)**. Confirm that Wi-Fi still works in other apps, the menu
+   Force Offline**. Confirm that Wi-Fi still works in other apps, the menu
    bar shows offline, and the alert appears after the second failed check.
 10. Disable test mode. Confirm that a successful real check hides the alert.
     Repeat with a real outage: disabling test mode must keep the alert visible
@@ -60,8 +60,16 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
     bar icon. A manual Check Connection Now should dismiss its Checking popover
     when complete without showing a status popover.
 21. With the alert visible, confirm that its outline matches the icon's configured
-    color and gently pulses over roughly 3 seconds without moving the text or
-    resizing the window. Change the icon color and confirm the outline follows.
-    Enable Reduce Motion while the alert is visible: the outline should become
-    steady. Disable Reduce Motion: the gentle pulse should resume. Confirm the
+    color and the entire window gently pulses over roughly 3 seconds without
+    moving the text or resizing the window. Change the icon color and confirm the
+    outline follows. Enable Reduce Motion while the alert is visible: the whole
+    window should become steady. Disable Reduce Motion: the pulse should resume. Confirm the
     entire alert still opens Wi-Fi settings when clicked.
+22. Check that Dev Flags shows “Force Offline” and uses the configured No Network
+    icon and color. Customize the icon in Appearance and verify that the flag and
+    alert both follow it.
+23. While the alert is visible, select each Offline Alert position. Confirm that it
+    moves immediately on the main display and stays clear of the notch, menu bar,
+    and Dock. Test with the menu bar hidden and the Dock on different screen edges.
+    Quit and relaunch to confirm the selected position persists. Reconnect an
+    external display and confirm that the alert remains on screen.

@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var pingURLInvalid  = false
     @State private var isLaunchEnabled = false
     @State private var forceOffline = AppState.shared.forceOffline
+    @AppStorage("offlineAlertPosition") private var offlineAlertPosition = OfflineAlertPosition.topRight
 
     @State private var leftRightClickEnabled = true
     @State private var leftClickAction       = "wifi"
@@ -40,6 +41,11 @@ struct SettingsView: View {
     @State private var connectedSlot  = IconPreferences.slot(for: .connected)
     @State private var blockedSlot    = IconPreferences.slot(for: .blocked)
     @State private var noNetworkSlot  = IconPreferences.slot(for: .noNetwork)
+
+    private var offlineFlagIcon: IconPreferences.Slot {
+        NSImage(systemSymbolName: noNetworkSlot.symbolName, accessibilityDescription: nil) != nil
+            ? noNetworkSlot : .defaultNoNetwork
+    }
     @State private var showSymbolBrowser = false
     @StateObject private var userSetsStore      = UserIconSetsStore()
     @State private var showSaveSetPanel         = false
@@ -425,11 +431,28 @@ struct SettingsView: View {
                     )
                 }
 
+                SettingsSection(title: "Offline Alert") {
+                    SettingsRow(icon: "rectangle.inset.topright.filled", iconColor: .blue,
+                                title: "Position",
+                                subtitle: "On the main display. Updates immediately.") {
+                        Picker("Alert position", selection: $offlineAlertPosition) {
+                            ForEach(OfflineAlertPosition.allCases) { position in
+                                Text(position.title).tag(position)
+                            }
+                        }
+                        .labelsHidden()
+                        .frame(width: 180)
+                        .onChange(of: offlineAlertPosition) { _, _ in
+                            NotificationCenter.default.post(name: .offlineAlertPositionChanged, object: nil)
+                        }
+                    }
+                }
+
                 SettingsSection(title: "Dev Flags") {
-                    SettingsRow(icon: "wifi.exclamationmark", iconColor: .orange,
-                                title: "Force Offline (Test)",
+                    SettingsRow(icon: offlineFlagIcon.symbolName, iconColor: Color(nsColor: offlineFlagIcon.color),
+                                title: "Force Offline",
                                 subtitle: "Simulates failed checks without disconnecting Wi-Fi. Alert appears after two failures. Resets on relaunch.") {
-                        Toggle("Force offline for testing", isOn: $forceOffline).labelsHidden()
+                        Toggle("Force offline", isOn: $forceOffline).labelsHidden()
                             .onChange(of: forceOffline) { _, enabled in
                                 AppState.shared.setForceOffline(enabled)
                             }

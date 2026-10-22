@@ -62,7 +62,7 @@ Set custom keyboard shortcuts to quickly toggle Wi Fi, open Wi Fi settings, and 
 
 ### Offline alert
 
-A custom alert appears in the top-right corner after two consecutive failed
+A custom alert appears after two consecutive failed
 connectivity checks. It stays visible across desktops while the network is
 offline and disappears automatically after a successful check. Clicking anywhere on the alert opens
 macOS Wi-Fi settings so you can switch to a mobile hotspot or another connection;
@@ -75,9 +75,14 @@ including accessibility adjustments. Earlier macOS versions use a native
 vibrancy background with the same color wash. The window fits its content with
 14-point horizontal and 12-point vertical padding. Its icon and color match the
 menu bar's current connection state, including your appearance customizations.
-An outline in the icon's color pulses gently while the alert is visible; Reduce
-Motion keeps the outline steady. Connection changes update the menu bar icon
+The entire alert gently pulses while visible, with an outline in the icon's
+color. Reduce Motion keeps the window steady. Connection changes update the menu bar icon
 without showing additional status popovers.
+
+Choose **Settings → General → Offline Alert → Position** to place it under the
+notch (top center), in any corner, at bottom center, or in the center of the main
+display. The default is top right. Changes apply immediately to a visible alert
+and are saved for future launches. Placement avoids the notch, menu bar, and Dock.
 
 A failed internet probe or an unavailable network counts as a failure. Manual
 checks also count. Checks use your configured monitoring interval until the alert

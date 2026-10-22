@@ -75,6 +75,9 @@ including accessibility adjustments. Earlier macOS versions use a native
 vibrancy background with the same color wash. The window fits its content with
 14-point horizontal and 12-point vertical padding. Its icon and color match the
 menu bar's current connection state, including your appearance customizations.
+An outline in the icon's color pulses gently while the alert is visible; Reduce
+Motion keeps the outline steady. Connection changes update the menu bar icon
+without showing additional status popovers.
 
 A failed internet probe or an unavailable network counts as a failure. Manual
 checks also count. Checks use your configured monitoring interval until the alert

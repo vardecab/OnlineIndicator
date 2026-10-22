@@ -176,8 +176,35 @@ private struct OfflineAlertView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .fixedSize()
+        .overlay {
+            OfflineAlertOutline(color: Color(nsColor: icon.color))
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .iconPreferencesChanged)) { _ in
             slot = IconPreferences.slot(for: status)
+        }
+    }
+}
+
+private struct OfflineAlertOutline: View {
+    let color: Color
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var outline: some View {
+        RoundedRectangle(cornerRadius: OfflineAlertLayout.cornerRadius)
+            .strokeBorder(color, lineWidth: 1.5)
+    }
+
+    var body: some View {
+        if reduceMotion {
+            outline
+        } else {
+            outline.phaseAnimator([false, true]) { content, emphasized in
+                content.opacity(emphasized ? 1 : 0.5)
+            } animation: { _ in
+                .easeInOut(duration: 1.6)
+            }
         }
     }
 }

@@ -83,33 +83,13 @@ final class PopoverManager {
         show(content: content, autoDismissAfter: 0)
     }
 
-    func showConnectionStatus(_ status: AppState.ConnectionStatus) {
-        let text: String = switch status {
-        case .connected: "Connected"
-        case .blocked:   "Connection Blocked"
-        case .noNetwork: "No Network"
-        }
-        showText(text)
-    }
-
     func showCopied(_ label: String) {
         showText(label)
-    }
-
-    /// Shows the startup greeting. Duration is 2 s so the AppDelegate's
-    /// 2.3 s gate timer always fires after the tooltip has auto-dismissed.
-    func showLaunchTooltip() {
-        showText("\(AppInfo.appName) running", autoDismissAfter: 2.0)
     }
 
     /// "Turning On Wi-Fi…" / "Turning Off Wi-Fi…" — persists until dismissed.
     func showWiFiToggling(turningOn: Bool) {
         showPersistentText(turningOn ? "Turning On Wi-Fi…" : "Turning Off Wi-Fi…")
-    }
-
-    /// "Wi-Fi On" / "Wi-Fi Off" — shown after a power-state change completes.
-    func showWiFiPowerChanged(isOn: Bool) {
-        showText(isOn ? "Wi-Fi On" : "Wi-Fi Off", autoDismissAfter: 1.0)
     }
 
     /// "Opening Wi-Fi Settings" — brief acknowledgement before the pref pane opens.
@@ -120,15 +100,5 @@ final class PopoverManager {
     /// "Opening VPN Settings" — brief acknowledgement before the pref pane opens.
     func showOpeningVPNSettings() {
         showText("Opening Network Settings")
-    }
-
-    /// "No Network" — shown when SSID is lost while Wi-Fi is still powered on.
-    func showNoNetwork() {
-        showText("No Network")
-    }
-
-    /// "Switched to 'NetworkName'" — shown when the user joins a different network.
-    func showNetworkSwitched(to ssid: String) {
-        showText("Switched to \u{201C}\(ssid)\u{201D}", autoDismissAfter: 2.0)
     }
 }

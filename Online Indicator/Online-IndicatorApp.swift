@@ -32,11 +32,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindowDele
     private var lastIPv4: String?
     private var lastIPv6: String?
 
-    private var launchTooltipFinished          = false
-    private var receivedFirstStatus            = false
-    private var suppressNextStatusPopover      = false
-    private var suppressStatusUntilSSIDHandled = false
-
     private var lastKnownSSID: String?
     private var appInitiatedWiFiToggle  = false
     private var popoverManager: PopoverManager!
@@ -107,11 +102,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindowDele
         AppState.shared.statusUpdateHandler = { [weak self] status in
             guard let self else { return }
 
-            let previous = self.currentStatus
             self.currentStatus = status
             self.updateIcon(for: status)
-
-            self.receivedFirstStatus = true
 
             if UserDefaults.standard.bool(forKey: "useSSIDAsMenuBarLabel"),
                status == .connected || status == .blocked {
@@ -130,20 +122,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindowDele
                     }
                 }
             }
-
-            guard self.launchTooltipFinished else { return }
-            if self.suppressStatusUntilSSIDHandled { return }
-            if self.suppressNextStatusPopover {
-                self.suppressNextStatusPopover = false
-                return
-            }
-            guard status != previous else { return }
-            self.popoverManager.showConnectionStatus(status)
         }
 
-        AppState.shared.checkNowResultHandler = { [weak self] status in
-            guard let self else { return }
-            self.popoverManager.showConnectionStatus(status)
+        AppState.shared.checkNowResultHandler = { [weak self] _ in
+            self?.popoverManager.dismiss()
         }
 
         AppState.shared.start()
@@ -193,17 +175,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindowDele
                 }
             } else {
                 self.updateIcon(for: self.currentStatus)
-            }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.popoverManager.showLaunchTooltip()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.7) { [weak self] in
-            guard let self else { return }
-            self.launchTooltipFinished = true
-            if self.receivedFirstStatus {
-                self.popoverManager.showConnectionStatus(self.currentStatus)
             }
         }
     }
@@ -733,14 +704,9 @@ extension AppDelegate: CWEventDelegate {
 
                 if !isOn { self.lastKnownSSID = nil }
 
-                self.suppressNextStatusPopover = true
-
                 if self.appInitiatedWiFiToggle {
                     self.appInitiatedWiFiToggle = false
                     self.popoverManager.dismiss()
-                    self.popoverManager.showWiFiPowerChanged(isOn: isOn)
-                } else {
-                    self.popoverManager.showWiFiPowerChanged(isOn: isOn)
                 }
 
                 self.updateWiFiToggleView()
@@ -752,7 +718,6 @@ extension AppDelegate: CWEventDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
 
-            self.suppressStatusUntilSSIDHandled = true
             self.ssidDebounce?.invalidate()
 
             self.ssidDebounce = Timer.scheduledTimer(
@@ -760,19 +725,12 @@ extension AppDelegate: CWEventDelegate {
             ) { [weak self] _ in
                 guard let self else { return }
 
-                let statusSnapshot = self.currentStatus
-
                 self.fetchSSIDFromAirport { [weak self] airportSSID in
                     guard let self else { return }
-
-                    defer { self.suppressStatusUntilSSIDHandled = false }
 
                     let ssid = SSIDManager.shared.currentSSID() ?? airportSSID
 
                     if let ssid {
-                        if let previous = self.lastKnownSSID, previous != ssid {
-                            self.popoverManager.showNetworkSwitched(to: ssid)
-                        }
                         self.lastKnownSSID = ssid
                         self.updateIcon(for: self.currentStatus)
                         return
@@ -781,14 +739,8 @@ extension AppDelegate: CWEventDelegate {
                     guard let iface = self.wifiInterface, iface.powerOn() else { return }
                     guard self.lastKnownSSID != nil else { return }
 
-                    guard case .noNetwork = statusSnapshot else {
-                        self.lastKnownSSID = nil
-                        self.updateIcon(for: self.currentStatus)
-                        return
-                    }
-
                     self.lastKnownSSID = nil
-                    self.popoverManager.showNoNetwork()
+                    self.updateIcon(for: self.currentStatus)
                 }
             }
         }

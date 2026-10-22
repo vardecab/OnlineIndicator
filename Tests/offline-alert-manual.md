@@ -55,3 +55,13 @@ Build and launch the app in Xcode. Use a short monitoring interval for these che
 19. Use an endpoint that never responds. Confirm that recovery requests time out
     after 2.5 seconds rather than being cancelled by the next timer tick. Keep the
     menu open and confirm that recovery checks continue.
+20. Launch the app, disconnect, restore connectivity, toggle Wi-Fi, and switch
+    networks. Confirm that no automatic status popovers appear beneath the menu
+    bar icon. A manual Check Connection Now should dismiss its Checking popover
+    when complete without showing a status popover.
+21. With the alert visible, confirm that its outline matches the icon's configured
+    color and gently pulses over roughly 3 seconds without moving the text or
+    resizing the window. Change the icon color and confirm the outline follows.
+    Enable Reduce Motion while the alert is visible: the outline should become
+    steady. Disable Reduce Motion: the gentle pulse should resume. Confirm the
+    entire alert still opens Wi-Fi settings when clicked.

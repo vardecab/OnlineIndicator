@@ -118,7 +118,7 @@ final class OfflineAlertManager: NSObject {
         button.autoresizingMask = [.width, .height]
         button.isBordered = false
         button.focusRingType = .none
-        button.setAccessibilityLabel("Network is offline. Open Wi-Fi settings to switch to a mobile hotspot or another connection.")
+        button.setAccessibilityLabel("Network is down. Open WiFi settings to switch to a mobile hotspot or another connection.")
         canvas.addSubview(button)
         return canvas
     }
@@ -226,9 +226,9 @@ private struct OfflineAlertView: View {
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 5) {
-                Text("Network is offline")
+                Text("Network is down")
                     .font(.system(size: 13, weight: .semibold))
-                Text("Open Wi-Fi Settings…")
+                Text("Open WiFi settings")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }

@@ -1,166 +1,154 @@
 <p align="center">
-  <img src=".github/assets/app-icon.png" alt="Online Indicator X" width="120" />
+  <img src=".github/assets/app-icon.png" alt="Online Indicator X icon" width="120" />
 </p>
 
 <h1 align="center">Online Indicator X</h1>
 
+<p align="center">A macOS menu bar connection monitor with a persistent offline alert.</p>
+
 <p align="center">
-A macOS menu bar app that replaces the Wi-Fi icon with customizable status indicators.
+  <a href="https://github.com/vardecab/OnlineIndicator"><img src="https://img.shields.io/badge/version-1.6.0-blue" alt="Version 1.6.0" /></a>
+  <img src="https://img.shields.io/badge/macOS-14.6%2B-grey?logo=apple" alt="macOS 14.6 or later" />
+  <a href="https://github.com/vardecab/OnlineIndicator/blob/main/LICENSE"><img src="https://img.shields.io/github/license/vardecab/OnlineIndicator" alt="MIT license" /></a>
 </p>
-<br>
-<p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/platform-macOS-lightgrey?logo=apple&style=flat&color=%23FF5C60"></a>
-  <a href="https://github.com/bornexplorer/OnlineIndicator/releases" target="_blank"><img src="https://img.shields.io/github/v/release/bornexplorer/OnlineIndicator?style=flat&color=%23FAC800"></a>
-  <a href="https://github.com/bornexplorer/OnlineIndicator/blob/main/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/bornexplorer/OnlineIndicator?style=flat&color=%2334C759"></a>
-  <a href="https://ko-fi.com/bornexplorer" target="_blank"><img src="https://img.shields.io/badge/Ko--fi-FF5E5B?logo=ko-fi&logoColor=white"></a>
-</p>
-<br>
 
+Maintained by [vardecab](https://github.com/vardecab). This fork builds on
+[Online Indicator by bornexplorer](https://github.com/bornexplorer/OnlineIndicator)
+and adds persistent outage alerts, faster recovery checks, and a separate macOS
+app identity.
 
-
-<img src=".github/assets/app-preview.png" alt="Online Indicator X Preview" width="100%" />
-
-## Why Online Indicator X?
-
-The macOS WiFi icon only shows that you are connected to a router, not whether your internet is actually working or being blocked. Online Indicator X replaces it with a live status icon that verifies real internet connectivity at the network level, so you can instantly see if you are online, offline, or blocked without opening any apps, giving you a smarter and slightly geekier way to understand your connection at a glance.
-
-<br>
+Current version: **1.6.0 (build 4)**.
 
 ## Features
 
-<img src=".github/assets/wifi.png" height="32" height="32" /><br>
-**Ditch The Boring Wi-Fi Icon** <br>
-Online Indicator X brings a smarter network experience to your menu bar with a live status icon that clearly shows your connection and gives you quick access to Wi Fi controls and settings.
+- Menu bar indicators for connected, blocked, and no-network states.
+- Custom SF Symbols, colors, labels, and saved icon sets for each state.
+- A persistent “Network is down” alert after two consecutive failed checks.
+- One-click access to Wi-Fi settings from anywhere on the alert.
+- Configurable check interval and HTTP/HTTPS monitoring endpoint.
+- Wi-Fi controls, optional network name display, local IPv4/IPv6 copying,
+  customizable click actions, keyboard shortcuts, and launch at login.
 
-<img src=".github/assets/palette.png" height="32" height="32" /><br>
-**Make Every State Completely Yours!** <br>
-Choose from 17 ready made Icon Sets or use any SF Symbol, set custom colors and labels for each state, and save your setup as your own Icon Set to switch anytime with a single tap.
+The menu bar icon updates silently when connectivity changes. Automatic status
+popovers are disabled.
 
-<img src=".github/assets/icon.png" height="32" height="32" /><br>
-**Your Icon, Your Rules.** <br>
-Why should a menu bar icon only ever do one thing? With Online Indicator X, your left and right clicks each perform different actions and you can decide which does what. Swap them if the defaults do not feel right or disable custom actions entirely and just use the dropdown. You are always in control.
+## Offline alert and recovery
 
-<img src=".github/assets/bolt.png" height="32" height="32" /><br>
-**Fast and Simple Network Control** <br>
-Control your Wi Fi connection and access network settings directly from the menu with a single click. Instantly view your current IP address with live updates and copy it to your clipboard for quick and easy sharing without needing additional tools or steps. For a more minimal and clean menu, the IP address display can also be turned off.
+A failed internet probe or an unavailable network counts as a failure. After
+**two consecutive failed checks**, the alert appears and stays visible across
+desktops until a check succeeds. Manual checks count too. Clicking any part of
+the alert opens **Wi-Fi settings**, where you can switch to a mobile hotspot or
+another connection. Clicking does not dismiss the alert.
 
-<img src=".github/assets/monitor.png" height="32" height="32" /><br>
-**Flexible monitoring** <br>
-Decide how often Online Indicator X checks your network by using the default presets or set your own custom interval. By default it pings Apple’s captive portal server, but you can point it to any URL you trust, whether your own server, company endpoint, or a custom address, ensuring reliable and flexible connectivity monitoring.
+While the alert is visible, checks run every **3 seconds**, with a 2.5-second
+timeout per probe. A successful check hides the alert and restores the interval
+configured in Settings. Your saved interval is never overwritten; changing it
+during an outage takes effect for normal monitoring after recovery.
 
-<img src=".github/assets/peek.png" height="32" height="32" /><br>
-**Quick IP peek** <br>
-Your IPv4 and IPv6 are always one click away in the menu. Tap to copy instantly, or hide them for a cleaner look.
+The alert sizes itself to its content. Its icon and border color follow your
+current connection-state preferences. A pastel red background uses native
+**Liquid Glass on macOS 26+**, with a native vibrancy fallback on older systems.
+The whole alert expands and contracts in a double heartbeat; **Reduce Motion**
+disables the animation. macOS controls the native material's appearance and
+accessibility adjustments.
 
-<img src=".github/assets/keyboard.png" height="32" height="32" /><br>
-**Keyboard Shortcuts** <br>
-Set custom keyboard shortcuts to quickly toggle Wi Fi, open Wi Fi settings, and access network settings giving you faster control over your connectivity.
+In **Settings → General → Offline Alert → Position**, choose top left, under
+notch/top center, top right, center, bottom left, bottom center, or bottom right.
+The position is saved and updates a visible alert immediately on the main
+display. Placement stays clear of the notch, menu bar, and Dock.
 
-<br>
+Connectivity is inferred from the chosen endpoint's HTTP response. The current
+probe accepts HTTP 200–399 responses and does not validate captive-portal page
+content, so some sign-in networks can appear connected.
 
-## Download & Install
+## Build, install, and run
 
-### Offline alert
-
-A custom alert appears after two consecutive failed
-connectivity checks. It stays visible across desktops while the network is
-offline and disappears automatically after a successful check. Clicking anywhere on the alert opens
-macOS Wi-Fi settings so you can switch to a mobile hotspot or another connection;
-the alert stays visible until connectivity returns. No notification permission is
-required.
-
-The compact alert uses a pastel red tint over native Liquid Glass on macOS 26
-and later. macOS controls the glass appearance using your system settings,
-including accessibility adjustments. Earlier macOS versions use a native
-vibrancy background with the same color wash. The window fits its content with
-14-point horizontal and 12-point vertical padding. Its icon and color match the
-menu bar's current connection state, including your appearance customizations.
-The entire alert expands and contracts in a repeating double heartbeat, with an
-outline in the icon's color. Reduce Motion keeps the window steady. Connection changes update the menu bar icon
-without showing additional status popovers.
-
-Choose **Settings → General → Offline Alert → Position** to place it under the
-notch (top center), in any corner, at bottom center, or in the center of the main
-display. The default is top right. Changes apply immediately to a visible alert
-and are saved for future launches. Placement avoids the notch, menu bar, and Dock.
-
-A failed internet probe or an unavailable network counts as a failure. Manual
-checks also count. Checks use your configured monitoring interval until the alert
-appears. While it is visible, checks run every **3 seconds** to detect recovery
-quickly, with a 2.5-second timeout per probe. A successful check hides the alert,
-resets the failure counter, and restores your configured interval. Your saved
-interval is never changed, even if you edit it during an outage.
-
-To test without disconnecting, enable **Settings → General → Dev Flags → Force
-Offline (Test)**. This immediately records a failed check; the next check uses
-the configured interval and triggers the alert after the second failure. Turn
-the toggle off to check the real connection again; a successful result hides the
-alert. Test mode resets when the app quits.
-
-### Build, install, and run from source
-
-On a Mac with Xcode 26.1 or later installed and selected, run from this folder:
+Requirements: **macOS 14.6+** and **Xcode 26.1+**, with full Xcode selected as the
+active developer directory. Liquid Glass requires macOS 26 or later.
 
 ```bash
+git clone https://github.com/vardecab/OnlineIndicator.git
+cd OnlineIndicator
 ./build-and-run.sh
 ```
 
-The script builds a Release app with local ad-hoc signing (no paid developer
-account required), verifies its signature, replaces any existing
-`/Applications/Online Indicator X.app`, and launches it. It stops your running copy
-before replacement. If `/Applications` needs administrator access, `sudo` will
-request your password for installation. Build output stays in `build/DerivedData`.
+The script builds a Release app with local ad-hoc signing, verifies its signature
+and bundle identity, installs it as `/Applications/Online Indicator X.app`, and
+launches it. A paid developer account is not required for this local build. It
+stops your running X copy before replacing it and restores the previous
+installation if replacement fails. Installation may request an administrator
+password through `sudo` if `/Applications` is not writable. Build output is in
+`build/DerivedData`.
 
-Online Indicator X uses its own bundle identifier, `com.vardecab.OnlineIndicatorX`,
-so macOS distinguishes it from the original Online Indicator. Preferences,
-launch-at-login registration, and permissions are separate. Rebuild and reinstall
-with the script to replace an older X build that shared the original app's identity.
+If Xcode is installed but not selected, select it in **Xcode → Settings →
+Locations → Command Line Tools** before running the script.
 
-The current version is **1.5.1 (build 3)**. Versions follow SemVer
-(`MAJOR.MINOR.PATCH`); the separate numeric build number identifies the build.
-Update `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in both Debug and Release
-configurations in the Xcode project for future releases. Builds use those values
-directly rather than replacing the build number with a Git hash.
+X has its own bundle identifier, `com.vardecab.OnlineIndicatorX`, so it can coexist
+with the original Online Indicator. Preferences, permissions, and launch-at-login
+registration are separate. Rebuild to replace older X builds that shared the
+original app's identity.
 
-### 1 · Download
-Head to the [**Latest Release**](../../releases/latest) page and grab the latest `.dmg` file.
+Prebuilt packages, when available, are listed on this fork's
+[Releases page](https://github.com/vardecab/OnlineIndicator/releases). The local
+build script does not notarize the app for distribution.
 
-### 2 · Install
-Open the `.dmg` and drag **Online Indicator X** into your **Applications** folder. Done.
+## Test the alert without disconnecting
 
-### 3 · First Launch
+1. Enable **Settings → General → Dev Flags → Force Offline**.
+2. Wait for the next scheduled check, or use **Check Connection Now** as a click
+   action to reach the second failure sooner. The alert then appears and recovery
+   checks run every 3 seconds.
+3. Try the alert positions and click anywhere on the alert to open Wi-Fi settings.
+4. Turn Force Offline off. A successful real check hides the alert and restores
+   normal monitoring. If the connection is still down, the alert stays visible.
 
-#### Option A — System Settings
+Force Offline does not disconnect Wi-Fi and resets when the app quits. Its icon
+and color match your configured No Network appearance.
 
-1. Go to **System Settings → Privacy & Security**
-2. Scroll down until you see Online Indicator X listed as blocked
-3. Click **Open Anyway** and enter your password
+See [the manual test checklist](Tests/offline-alert-manual.md) for recovery,
+accessibility, animation, and display tests. On a Mac, run the policy and position
+checks with:
 
-#### Option B — Terminal
-
-Paste this into Terminal and press Enter:
 ```bash
-xattr -dr com.apple.quarantine /Applications/Online\ Indicator\ X.app
+swiftc 'Online Indicator/OfflineAlertPolicy.swift' \
+  'Online Indicator/OfflineAlertPosition.swift' Tests/main.swift \
+  -o /tmp/online-indicator-policy-tests
+/tmp/online-indicator-policy-tests
 ```
-Then open the app normally.
 
-> 💡 **Why does this happen?**
-> Apple requires a $99/year developer certificate to "notarise" apps. Online Indicator X is free and independent, so it skips that. The warning is Apple's way of flagging uncertified apps, not a sign that anything is wrong.
+Repository metadata checks use Python 3:
 
-<br>
+```bash
+python3 -m unittest discover -s Tests -p 'test_*.py'
+```
 
-## Privacy Policy
+## Versioning
 
-Online Indicator X collects no data. Period.
+Releases follow SemVer (`MAJOR.MINOR.PATCH`) with a separate numeric build number.
+The Xcode project's `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` are the
+source of truth for Debug and Release. The source plist references those settings;
+the menu bar and About screen read the built app's plist. No build step replaces
+the version with a Git hash. Keep this README and its version badge in sync when
+bumping the version.
 
-- No analytics, crash reporting or usage tracking
-- No personal information collected or transmitted
-- All preferences are stored locally on your Mac
+## Privacy
 
-The only outbound network request the app makes is the connectivity probe, a simple HTTP request to `captive.apple.com` (or your custom URL) to check if the internet is reachable. This is identical to what macOS itself does internally.
+- No analytics or usage tracking; preferences stay on your Mac.
+- Connectivity probes contact `http://captive.apple.com` by default, or your
+  chosen endpoint. That server receives a normal network request.
+- Local IP addresses are read from network interfaces; no public-IP lookup
+  service is used.
+- Optional Wi-Fi name display requires Location Services permission on macOS.
+  The app does not store or share your location.
+- The custom offline alert does not require notification permission.
 
-<br>
+## Contributing and license
 
-## License
+Report bugs and feature requests in
+[vardecab/OnlineIndicator issues](https://github.com/vardecab/OnlineIndicator/issues).
+For build failures, include the first compiler `error:` and nearby lines, your
+Xcode/macOS versions, and the app version and build number.
 
-[MIT License](LICENSE)
+Distributed under the [MIT License](LICENSE). Original copyright belongs to
+bornexplorer; fork modifications are credited to vardecab. Original license
+notices are retained.

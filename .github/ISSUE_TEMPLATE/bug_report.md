@@ -1,9 +1,9 @@
 ---
 name: Bug report
-about: Create a report to help us improve Online Indicator
+about: Create a report to help us improve Online Indicator X
 title: "[BUG] "
 labels: bug
-assignees: bornexplorer
+assignees: vardecab
 
 ---
 
@@ -12,7 +12,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Open Online Indicator
+1. Open Online Indicator X
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **System Details**
 - macOS version: [e.g. 26.0]
-- Online Indicator version: [e.g. 1.0]
+- Online Indicator X version: [e.g. 1.6.0, build 4]
 
 **Additional context**
 Add any other context about the problem here.

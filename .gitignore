@@ -49,6 +49,7 @@ Config/Secrets.swift
 *.xcarchive
 
 # Test Output
+__pycache__/
 *.xcresult
 *.trace
 TestResults/

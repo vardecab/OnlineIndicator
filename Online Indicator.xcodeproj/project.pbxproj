@@ -255,7 +255,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Online Indicator/Online Indicator.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -274,14 +274,14 @@
 				INFOPLIST_FILE = "Online-Indicator-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocationUsageDescription = "Online Indicator uses your location solely to read the name of your connected Wi-Fi network. Your location is never stored or shared.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2026 vardecab. Based on Online Indicator by bornexplorer.";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Online Indicator X uses your location solely to read the name of your connected Wi-Fi network. Your location is never stored or shared.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vardecab.OnlineIndicatorX";
 				PRODUCT_NAME = "Online Indicator X";
 				INFOPLIST_KEY_CFBundleDisplayName = "Online Indicator X";
@@ -303,7 +303,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Online Indicator/Online Indicator.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -322,14 +322,14 @@
 				INFOPLIST_FILE = "Online-Indicator-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocationUsageDescription = "Online Indicator uses your location solely to read the name of your connected Wi-Fi network. Your location is never stored or shared.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2026 vardecab. Based on Online Indicator by bornexplorer.";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Online Indicator X uses your location solely to read the name of your connected Wi-Fi network. Your location is never stored or shared.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vardecab.OnlineIndicatorX";
 				PRODUCT_NAME = "Online Indicator X";
 				INFOPLIST_KEY_CFBundleDisplayName = "Online Indicator X";

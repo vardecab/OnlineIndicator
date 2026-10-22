@@ -1,9 +1,9 @@
 ---
 name: Feature request
-about: Suggest an idea for Online Indicator
+about: Suggest an idea for Online Indicator X
 title: "[Feature Request] "
 labels: feature request
-assignees: bornexplorer
+assignees: vardecab
 
 ---
 
